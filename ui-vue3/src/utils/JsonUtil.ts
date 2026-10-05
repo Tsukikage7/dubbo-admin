@@ -17,8 +17,9 @@
 
 import { isSafeNumber, parse } from 'lossless-json'
 
-export function parseJsonWithSafeNumbers<T>(text: string): T {
+// Unsafe numbers become strings; callers must narrow the parsed value before using it.
+export function parseJsonWithSafeNumbers(text: string): unknown {
   return parse(text, undefined, {
     parseNumber: (value) => (isSafeNumber(value) ? parseFloat(value) : value)
-  }) as T
+  })
 }

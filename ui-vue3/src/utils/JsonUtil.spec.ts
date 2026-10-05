@@ -15,22 +15,36 @@
  * limitations under the License.
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import { parseJsonWithSafeNumbers } from './JsonUtil'
 
 describe('parseJsonWithSafeNumbers', () => {
   it('preserves integers outside the JavaScript safe range', () => {
-    const args = parseJsonWithSafeNumbers<unknown[]>('[1694620889412087810]')
+    const args = parseJsonWithSafeNumbers('[1694620889412087810]')
 
+    expectTypeOf(args).toEqualTypeOf<unknown>()
     expect(args).toEqual(['1694620889412087810'])
     expect(JSON.stringify({ args })).toBe('{"args":["1694620889412087810"]}')
   })
 
   it('keeps safe numbers as numbers and ignores numeric strings', () => {
-    const value = parseJsonWithSafeNumbers<{ text: string; value: number }>(
+    const value = parseJsonWithSafeNumbers(
       '{"text":"1694620889412087810","value":9007199254740991}'
     )
 
     expect(value).toEqual({ text: '1694620889412087810', value: 9007199254740991 })
+  })
+
+  it('preserves unsafe numbers in nested objects and arrays', () => {
+    const value = parseJsonWithSafeNumbers(
+      '{"id":1694620889412087810,"nested":{"values":[9007199254740991,9007199254740992,-9007199254740991,-9007199254740992]}}'
+    )
+
+    expect(value).toEqual({
+      id: '1694620889412087810',
+      nested: {
+        values: [9007199254740991, '9007199254740992', -9007199254740991, '-9007199254740992']
+      }
+    })
   })
 })

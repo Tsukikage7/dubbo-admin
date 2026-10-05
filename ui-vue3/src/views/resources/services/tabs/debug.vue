@@ -554,9 +554,9 @@ async function handleInvoke() {
     )
     return
   }
-  let args: any[]
+  let args: unknown[]
   try {
-    const parsedArgs = parseJsonWithSafeNumbers<unknown>(requestValue.value)
+    const parsedArgs = parseJsonWithSafeNumbers(requestValue.value)
     if (Array.isArray(parsedArgs)) {
       args = parsedArgs
     } else {
